@@ -1,8 +1,25 @@
 <script setup>
 import Layout from '../Layouts/Main.vue'
 import { ref } from 'vue'
+import { useForm } from '@inertiajs/vue3'
 
 defineOptions({ layout: Layout })
+
+const form = useForm({
+    title: null,
+    roomNo: null,
+    date: null,
+    startTime: null,
+    endTime: null,
+})
+
+function submit() {
+  form.post('/update-schedule',{
+    onSuccess: () => {
+        form.reset();
+    },
+  })
+}
 
 const updateDialog = ref(false);
 </script>
@@ -13,6 +30,9 @@ const updateDialog = ref(false);
             <v-table>
                 <thead>
                     <tr>
+                        <th class="text-left">
+                            Title
+                        </th>
                         <th class="text-left">
                             Room No.
                         </th>
@@ -28,9 +48,10 @@ const updateDialog = ref(false);
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="n in 3">
-                        <td>Room 10{{ n }}</td>
-                        <td>03/14/2025</td>
+                    <tr v-for="n in 10">
+                        <td>Meeting</td>
+                        <td>Room {{ n }}</td>
+                        <td>3/{{ n }}/2025</td>
                         <td>1:00AM - 2:00AM</td>
                         <td>
                             <v-btn icon="mdi-pencil" @click="updateDialog = true" class="ma-2 pa-2" size="x-small"></v-btn>
@@ -42,24 +63,62 @@ const updateDialog = ref(false);
             <v-pagination :length="4"></v-pagination>
         </v-card-text>
     </v-card>
-    <v-dialog
-        v-model="updateDialog"
-        width="auto"
+    <v-dialog v-model="updateDialog" width="auto"
     >
         <v-card
-            title="Update Schedule"
-            subtitle="Edit schedule form"
-            width="450px"
+            title="Update Schedule" subtitle="Edit schedule form" width="450px" :loading="form.processing"
         >
-            <v-form>
+            <v-form @submit.prevent="submit">
                 <v-card-text>
-                    <v-text-field variant="outlined" label="Room No."></v-text-field>
-                    <v-text-field type="date" variant="outlined" label="Date"></v-text-field>
-                    <v-text-field type="time" variant="outlined" label="Start Time"></v-text-field>
-                    <v-text-field type="time" variant="outlined" label="End Time"></v-text-field>
+                    <v-row>
+                        <v-text-field 
+                            v-model="form.title" 
+                            :error-messages="form.errors.title" 
+                            variant="outlined" 
+                            class="ma-1 pa-1" 
+                            label="Title"
+                        ></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-text-field 
+                            v-model="form.roomNo" 
+                            :error-messages="form.errors.roomNo" 
+                            variant="outlined"
+                            class="ma-1 pa-1" 
+                            label="Room No."
+                        ></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-text-field 
+                            v-model="form.date" 
+                            :error-messages="form.errors.date"
+                            type="date" 
+                            class="ma-1 pa-1" 
+                            variant="outlined" 
+                            label="Date"
+                        ></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-text-field 
+                            v-model="form.startTime" 
+                            :error-messages="form.errors.startTime" 
+                            type="time" 
+                            class="ma-1 pa-1" 
+                            variant="outlined" 
+                            label="Start Time"
+                        ></v-text-field>
+                        <v-text-field 
+                            v-model="form.endTime" 
+                            :error-messages="form.errors.endTime" 
+                            type="time" 
+                            class="ma-1 pa-1" 
+                            variant="outlined" 
+                            label="End Time"
+                        ></v-text-field>
+                    </v-row>
                     <v-card-actions class="d-flex justify-end">
                         <v-btn @click="updateDialog = false">Close</v-btn>
-                        <v-btn>Submit</v-btn>
+                        <v-btn type="submit" :loading="form.processing">Submit</v-btn>
                     </v-card-actions>
                 </v-card-text>
             </v-form>

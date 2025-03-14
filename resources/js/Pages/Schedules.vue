@@ -9,6 +9,7 @@ const updateDialog = ref(false);
 <template>
     <v-card title="Schedules" subtitle="List of schedules">
         <v-card-text>
+            <v-text-field label="Search" variant="outlined"></v-text-field>
             <v-table>
                 <thead>
                     <tr>
@@ -27,9 +28,9 @@ const updateDialog = ref(false);
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Room 101</td>
-                        <td>14/03/2025</td>
+                    <tr v-for="n in 3">
+                        <td>Room 10{{ n }}</td>
+                        <td>03/14/2025</td>
                         <td>1:00AM - 2:00AM</td>
                         <td>
                             <v-btn icon="mdi-pencil" @click="updateDialog = true" class="ma-2 pa-2" size="x-small"></v-btn>

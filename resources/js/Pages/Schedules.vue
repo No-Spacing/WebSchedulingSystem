@@ -38,6 +38,7 @@ const updateDialog = ref(false);
                     </tr>
                 </tbody>
             </v-table>
+            <v-pagination :length="4"></v-pagination>
         </v-card-text>
     </v-card>
     <v-dialog

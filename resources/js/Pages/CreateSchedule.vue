@@ -6,7 +6,7 @@ defineOptions({ layout: Layout })
 
 const form = useForm({
     title: null,
-    roomNo: null,
+    room: null,
     date: null,
     startTime: null,
     endTime: null,
@@ -35,8 +35,8 @@ function submit() {
                 </v-row>
                 <v-row>
                     <v-text-field 
-                        v-model="form.roomNo" 
-                        :error-messages="form.errors.roomNo" 
+                        v-model="form.room" 
+                        :error-messages="form.errors.room" 
                         variant="outlined" 
                         class="ma-1 pa-1" 
                         label="Room No."

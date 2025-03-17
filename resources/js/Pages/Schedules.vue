@@ -5,6 +5,8 @@ import { useForm } from '@inertiajs/vue3'
 
 defineOptions({ layout: Layout })
 
+defineProps ({ schedules: Object })
+
 const form = useForm({
     title: null,
     roomNo: null,
@@ -48,11 +50,11 @@ const updateDialog = ref(false);
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="n in 10">
-                        <td>Meeting</td>
-                        <td>Room {{ n }}</td>
-                        <td>3/{{ n }}/2025</td>
-                        <td>1:00AM - 2:00AM</td>
+                    <tr v-for="item in schedules.data">
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.room }}</td>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.startTime }} - {{ item.endTime }}</td>
                         <td>
                             <v-btn icon="mdi-pencil" @click="updateDialog = true" class="ma-2 pa-2" size="x-small"></v-btn>
                             <v-btn icon="mdi-trash-can-outline" class="ma-2 pa-2" size="x-small"></v-btn>

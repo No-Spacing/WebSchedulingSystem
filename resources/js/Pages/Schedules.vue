@@ -1,42 +1,86 @@
 <script setup>
 import Layout from '../Layouts/Main.vue'
-import { ref } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+import { useForm, router } from '@inertiajs/vue3'
 
 defineOptions({ layout: Layout })
+const props = defineProps ({ schedules: Object })
 
-defineProps ({ schedules: Object })
+const updateDialog = ref(false);
 
-const form = useForm({
+let form = useForm({
+    id: null,
     title: null,
-    roomNo: null,
+    room: null,
     date: null,
     startTime: null,
     endTime: null,
+    search: null,
 })
+
+function remove(id) {
+    if (confirm("Press a button!") == true) {
+        router.delete('/delete-schedule/' + id, {
+            onSuccess: () => {
+                console.log('Success')
+            },
+            onError: (error) => {
+                console.log(error)
+            }
+        });
+    } 
+}
+
+function dialog(data){
+    this.updateDialog = true
+    form.id = data.id
+    form.title = data.title
+    form.room = data.room
+    form.date = data.date
+    form.startTime = data.startTime
+    form.endTime = data.endTime
+}
 
 function submit() {
   form.post('/update-schedule',{
     onSuccess: () => {
-        form.reset();
+        console.log("Success")
+        this.updateDialog = false
     },
+    onError: (error) => {
+        console.log(error)
+    }
   })
 }
 
-const updateDialog = ref(false);
+function paginations(){
+    router.get('/schedules?page=' + props.schedules.current_page)
+}
+
+watch(() => form.search,
+    (newValue) => {
+        router.get('/schedules',
+            { search: newValue }, 
+            { preserveState: true }
+        )
+    }
+)
 </script>
 <template>
     <v-card title="Schedules" subtitle="List of schedules">
         <v-card-text>
-            <v-text-field label="Search" variant="outlined"></v-text-field>
+            <v-text-field v-model="form.search" label="Search" variant="outlined"></v-text-field>
             <v-table>
                 <thead>
                     <tr>
                         <th class="text-left">
+                            No.
+                        </th>
+                        <th class="text-left">
                             Title
                         </th>
                         <th class="text-left">
-                            Room No.
+                            Room
                         </th>
                         <th class="text-left">
                             Date
@@ -50,19 +94,20 @@ const updateDialog = ref(false);
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in schedules.data">
+                    <tr v-for="item, key in schedules.data">
+                        <td>{{ ++key }}</td>
                         <td>{{ item.title }}</td>
                         <td>{{ item.room }}</td>
                         <td>{{ item.date }}</td>
                         <td>{{ item.startTime }} - {{ item.endTime }}</td>
                         <td>
-                            <v-btn icon="mdi-pencil" @click="updateDialog = true" class="ma-2 pa-2" size="x-small"></v-btn>
-                            <v-btn icon="mdi-trash-can-outline" class="ma-2 pa-2" size="x-small"></v-btn>
+                            <v-btn icon="mdi-pencil" @click.prevent="dialog(item)" class="ma-2 pa-2" size="x-small"></v-btn>
+                            <v-btn icon="mdi-trash-can-outline" @click="remove(item.id)" class="ma-2 pa-2" size="x-small"></v-btn>
                         </td>
                     </tr>
                 </tbody>
             </v-table>
-            <v-pagination :length="4"></v-pagination>
+            <v-pagination v-model="schedules.current_page" :length="schedules.last_page" @update:modelValue="paginations()"></v-pagination>
         </v-card-text>
     </v-card>
     <v-dialog v-model="updateDialog" width="auto"
@@ -70,7 +115,7 @@ const updateDialog = ref(false);
         <v-card
             title="Update Schedule" subtitle="Edit schedule form" width="450px" :loading="form.processing"
         >
-            <v-form @submit.prevent="submit">
+            <v-form @submit.prevent="submit()">
                 <v-card-text>
                     <v-row>
                         <v-text-field 
@@ -83,8 +128,8 @@ const updateDialog = ref(false);
                     </v-row>
                     <v-row>
                         <v-text-field 
-                            v-model="form.roomNo" 
-                            :error-messages="form.errors.roomNo" 
+                            v-model="form.room" 
+                            :error-messages="form.errors.room" 
                             variant="outlined"
                             class="ma-1 pa-1" 
                             label="Room No."

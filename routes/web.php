@@ -5,6 +5,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\ScheduleController;
 use App\Models\Schedule;
 
+Route::inertia('/dashboard', 'Dashboard');
+
 Route::get('/schedules', [ScheduleController::class, 'show']);
 
 Route::inertia('/create-schedule', 'CreateSchedule');

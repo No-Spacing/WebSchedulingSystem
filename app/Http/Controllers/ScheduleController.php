@@ -19,6 +19,7 @@ class ScheduleController extends Controller
             'startTime' => $request->startTime,
             'endTime' => $request->endTime,
         ]);  
+        return redirect('/schedules');
     }
 
     public function UpdateSchedule(ScheduleRequest $request){
@@ -46,6 +47,7 @@ class ScheduleController extends Controller
         ->where('title', 'like', '%' . $request->search . '%')
         ->orWhere('room', 'like', '%' . $request->search . '%')
         ->orWhere('date', 'like', '%' . $request->search . '%')
+        ->orderBy('created_at', 'desc')
         ->paginate(5);
         return Inertia::render('Schedules',[
           'schedules' => $schedules

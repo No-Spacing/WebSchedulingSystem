@@ -6,7 +6,8 @@ import { useForm, router } from '@inertiajs/vue3'
 defineOptions({ layout: Layout })
 const props = defineProps ({ schedules: Object })
 
-const updateDialog = ref(false);
+let updateDialog = ref(false), snackbar = ref(false), snackbarText = ref("");
+
 
 let form = useForm({
     id: null,
@@ -18,18 +19,6 @@ let form = useForm({
     search: null,
 })
 
-function remove(id) {
-    if (confirm("Press a button!") == true) {
-        router.delete('/delete-schedule/' + id, {
-            onSuccess: () => {
-                console.log('Success')
-            },
-            onError: (error) => {
-                console.log(error)
-            }
-        });
-    } 
-}
 
 function dialog(data){
     this.updateDialog = true
@@ -44,13 +33,28 @@ function dialog(data){
 function submit() {
   form.post('/update-schedule',{
     onSuccess: () => {
-        console.log("Success")
         this.updateDialog = false
+        this.snackbar = true
+        this.snackbarText = "Schedule updated."
     },
     onError: (error) => {
         console.log(error)
     }
   })
+}
+
+function remove(id) {
+    if (confirm("Do you want to remove this schedule?") == true) {
+        router.delete('/delete-schedule/' + id, {
+            onSuccess: () => {
+                this.snackbar = true
+                this.snackbarText = "Schedule deleted."
+            },
+            onError: (error) => {
+                console.log(error)
+            }
+        });
+    } 
 }
 
 function paginations(){
@@ -171,4 +175,13 @@ watch(() => form.search,
             </v-form>
         </v-card>
     </v-dialog>
+    <v-snackbar
+        :timeout="2000"
+        color="success"
+        variant="outlined"
+        v-model="snackbar"
+        location="top"
+        :text="snackbarText"
+    >
+    </v-snackbar>
 </template>

@@ -39,7 +39,7 @@ function submit() {
                         :error-messages="form.errors.room" 
                         variant="outlined" 
                         class="ma-1 pa-1" 
-                        label="Room No."
+                        label="Room"
                     ></v-text-field>
                 </v-row>
                 <v-row>

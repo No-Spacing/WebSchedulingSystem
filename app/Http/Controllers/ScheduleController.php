@@ -42,7 +42,6 @@ class ScheduleController extends Controller
 
     public function show(Request $request)
     {
-        error_log($request->title);
         $schedules = DB::table('schedules')
         ->where('title', 'like', '%' . $request->search . '%')
         ->orWhere('room', 'like', '%' . $request->search . '%')

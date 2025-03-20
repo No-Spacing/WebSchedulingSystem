@@ -14,9 +14,6 @@ const form = useForm({
 
 function submit() {
   form.post('/post-schedule',{
-    onSuccess: () => {
-        form.reset();
-    },
   })
 }
 </script>
@@ -55,7 +52,7 @@ function submit() {
                 <v-row>
                     <v-text-field 
                         v-model="form.startTime" 
-                        :error-messages="form.errors.startTime" 
+                        :error-messages="form.errors.startTime || $page.props.flash.message" 
                         type="time" 
                         class="ma-1 pa-1" 
                         variant="outlined" 
@@ -63,7 +60,7 @@ function submit() {
                     ></v-text-field>
                     <v-text-field 
                         v-model="form.endTime" 
-                        :error-messages="form.errors.endTime" 
+                        :error-messages="form.errors.endTime || $page.props.flash.message" 
                         type="time" 
                         class="ma-1 pa-1" 
                         variant="outlined" 

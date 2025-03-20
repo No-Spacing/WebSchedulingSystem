@@ -27,8 +27,8 @@ class ScheduleRequest extends FormRequest
             'title' => 'required',
             'room' => 'required',
             'date' => 'required',
-            'startTime' => 'required',
-            'endTime' => 'required',
+            'startTime' => 'required|different:endTime',
+            'endTime' => 'required|different:startTime',
         ];
     }
    

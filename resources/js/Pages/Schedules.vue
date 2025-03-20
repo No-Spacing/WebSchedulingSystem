@@ -31,7 +31,7 @@ function dialog(data){
 }
 
 function submit() {
-  form.post('/update-schedule',{
+  form.put('/update-schedule',{
     onSuccess: () => {
         this.updateDialog = false
         this.snackbar = true

@@ -12,19 +12,39 @@ class ScheduleController extends Controller
 {
 
     public function PostSchedule(ScheduleRequest $request){
-        Schedule::create([
-            'title' => $request->title,
-            'room' => $request->room,
-            'date' => $request->date,
-            'startTime' => $request->startTime,
-            'endTime' => $request->endTime,
-        ]);  
-        return redirect('/schedules');
+
+        $schedules = Schedule::where('room', $request->room)
+                    ->where('date', $request->date)
+                    ->where(function ($query) use ($request) {
+                        $query->where('startTime', '<', $request->startTime)
+                        ->where('endTime', '>', $request->endTime);
+                    })
+                    ->orWhere(function ($query) use ($request){
+                        $query->where('startTime', '>', $request->startTime)
+                        ->where('startTime', '<', $request->endTime);
+                    })
+                    ->orWhere(function ($query) use ($request){
+                        $query->where('endTime', '>', $request->startTime)
+                        ->where('endTime', '<', $request->endTime);
+                    })
+                    ->first();
+
+        if($schedules){
+            return back()->with(['message' => 'Selected Time has already been taken']);
+        }else{
+            Schedule::create([
+                'title' => $request->title,
+                'room' => $request->room,
+                'date' => $request->date,
+                'startTime' => $request->startTime,
+                'endTime' => $request->endTime,
+            ]);
+            return redirect('/schedules');
+        }
     }
 
     public function UpdateSchedule(ScheduleRequest $request){
-        DB::table('schedules')
-        ->where('id', $request->id)
+        Schedule::where('id', $request->id)
         ->update([
             'title' => $request->title,
             'room' => $request->room,
@@ -35,21 +55,18 @@ class ScheduleController extends Controller
     }
 
     public function DeleteSchedule($id){
-        DB::table('schedules')
-        ->where('id', $id)
+        Schedule::where('id', $id)
         ->delete();
     }
 
     public function show(Request $request)
     {
-        $schedules = DB::table('schedules')
-        ->where('title', 'like', '%' . $request->search . '%')
-        ->orWhere('room', 'like', '%' . $request->search . '%')
-        ->orWhere('date', 'like', '%' . $request->search . '%')
-        ->orderBy('created_at', 'desc')
-        ->paginate(5);
         return Inertia::render('Schedules',[
-          'schedules' => $schedules
+          'schedules' => Schedule::where('title', 'like', '%' . $request->search . '%')
+                            ->orWhere('room', 'like', '%' . $request->search . '%')
+                            ->orWhere('date', 'like', '%' . $request->search . '%')
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(5)
         ]);
     }
 }

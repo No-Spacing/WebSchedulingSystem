@@ -44,14 +44,35 @@ class ScheduleController extends Controller
     }
 
     public function UpdateSchedule(ScheduleRequest $request){
-        Schedule::where('id', $request->id)
-        ->update([
-            'title' => $request->title,
-            'room' => $request->room,
-            'date' => $request->date,
-            'startTime' => $request->startTime,
-            'endTime' => $request->endTime,
-        ]);
+        $schedules = Schedule::where('room', $request->room)
+                    ->where('date', $request->date)
+                    ->where(function ($query) use ($request) {
+                        $query->where('startTime', '<', $request->startTime)
+                        ->where('endTime', '>', $request->endTime);
+                    })
+                    ->orWhere(function ($query) use ($request){
+                        $query->where('startTime', '>', $request->startTime)
+                        ->where('startTime', '<', $request->endTime);
+                    })
+                    ->orWhere(function ($query) use ($request){
+                        $query->where('endTime', '>', $request->startTime)
+                        ->where('endTime', '<', $request->endTime);
+                    })
+                    ->first();
+
+        if($schedules){
+            return back()->with(['message' => 'Selected Time has already been taken.']);
+        }else{
+            Schedule::where('id', $request->id)
+                    ->update([
+                        'title' => $request->title,
+                        'room' => $request->room,
+                        'date' => $request->date,
+                        'startTime' => $request->startTime,
+                        'endTime' => $request->endTime,
+                    ]);
+        }
+        
     }
 
     public function DeleteSchedule($id){

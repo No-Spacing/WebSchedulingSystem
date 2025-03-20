@@ -32,10 +32,12 @@ function dialog(data){
 
 function submit() {
   form.put('/update-schedule',{
-    onSuccess: () => {
-        this.updateDialog = false
-        this.snackbar = true
-        this.snackbarText = "Schedule updated."
+    onSuccess: (success) => {
+        if(!success.props.flash.message){
+            this.updateDialog = false
+            this.snackbar = true
+            this.snackbarText = "Schedule updated."
+        } 
     },
     onError: (error) => {
         console.log(error)
@@ -152,15 +154,17 @@ watch(() => form.search,
                     <v-row>
                         <v-text-field 
                             v-model="form.startTime" 
-                            :error-messages="form.errors.startTime" 
+                            :error-messages="form.errors.startTime || $page.props.flash.message" 
                             type="time" 
                             class="ma-1 pa-1" 
                             variant="outlined" 
                             label="Start Time"
                         ></v-text-field>
+                    </v-row>
+                    <v-row>
                         <v-text-field 
                             v-model="form.endTime" 
-                            :error-messages="form.errors.endTime" 
+                            :error-messages="form.errors.endTime || $page.props.flash.message" 
                             type="time" 
                             class="ma-1 pa-1" 
                             variant="outlined" 

@@ -60,7 +60,9 @@ function remove(id) {
 }
 
 function paginations(){
-    router.get('/schedules?page=' + props.schedules.current_page)
+    router.visit(props.schedules.links[props.schedules.current_page].url,
+        { preserveState: true }
+    )
 }
 
 watch(() => form.search,

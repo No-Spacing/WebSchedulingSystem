@@ -72,7 +72,7 @@ class ScheduleController extends Controller
                         'endTime' => $request->endTime,
                     ]);
         }
-        
+
     }
 
     public function DeleteSchedule($id){
@@ -88,6 +88,7 @@ class ScheduleController extends Controller
                             ->orWhere('date', 'like', '%' . $request->search . '%')
                             ->orderBy('created_at', 'desc')
                             ->paginate(5)
+                            ->withQueryString()
         ]);
     }
 }
